@@ -13,6 +13,7 @@
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.# (1)
 import pyaudio
 import wave
+from array import array
 
 # (2)
 CHUNK = 1024
@@ -25,10 +26,10 @@ WAVE_OUTPUT_FILENAME = "output.wav"
 # (3)
 p = pyaudio.PyAudio()
 stream = p.open(format=FORMAT,
-channels=CHANNELS,
-rate=RATE,
-input=True,
-frames_per_buffer=CHUNK)
+                channels=CHANNELS,
+                rate=RATE,
+                input=True,
+                frames_per_buffer=CHUNK)
 
 # (4)
 print("* recording")
@@ -36,8 +37,10 @@ print("* recording")
 frames = []
 
 for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-  data = stream.read(CHUNK)
-  frames.append(data) # 2 bytes(16 bits) per channel
+    data = stream.read(CHUNK)
+    frames.append(data) # 2 bytes(16 bits) per channel
+    # print len(data)
+    print array('h', data)
 
 # (5)
 print("* done recording")
@@ -51,5 +54,5 @@ wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
 wf.setnchannels(CHANNELS)
 wf.setsampwidth(p.get_sample_size(FORMAT))
 wf.setframerate(RATE)
-wf.writeframes(b''.join(frames))
+wf.writeframes('b'.join(frames))
 wf.close()
